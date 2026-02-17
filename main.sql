@@ -168,7 +168,7 @@ CASE
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
                 ims1.tasteless_code, 
-                pis_ing_1.item_code, 
+               -- pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
             )
@@ -185,7 +185,7 @@ CASE
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
                 ims1.tasteless_code, 
-                pis_ing_1.item_code, 
+              --  pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
             )
@@ -202,7 +202,7 @@ CASE
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
                 ims1.tasteless_code, 
-                pis_ing_1.item_code, 
+               -- pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
             )
@@ -219,7 +219,7 @@ CASE
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
                 ims1.tasteless_code, 
-                pis_ing_1.item_code, 
+              --  pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
             )
@@ -236,7 +236,7 @@ CASE
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
                 ims1.tasteless_code, 
-                pis_ing_1.item_code, 
+              --  pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
             )
@@ -256,7 +256,8 @@ COALESCE(
     ),
     bas_ing_1.bi_code,
     ims1.tasteless_code,
-    pis_ing_1.item_code,
+    --  pis_ing_1.item_code,
+    pi1.reference_number,
     ni1.nwi_code,
     im_as_ing_1.tasteless_menu_code
 ) AS menu_item_ingredients_code_sub_1,
@@ -272,7 +273,8 @@ COALESCE(
     ),
     bas_ing_1.ingredient_description,
     ims1.full_item_description,
-    pis_ing_1.description,
+    -- pis_ing_1item_code,
+    pi1.full_item_description,
     ni1.item_description,
     im_as_ing_1.menu_item_description
 ) AS menu_item_ingredients_description_sub_1
@@ -303,8 +305,8 @@ LEFT JOIN menu_items as menu_as_ing
 -- sub_ing
 
 -- production items
-LEFT JOIN production_item_lines pis_ing_1
-	ON pis_ing_1.production_item_id = production_items.reference_number AND production_item_line_type = 'ingredient'
+-- LEFT JOIN production_item_lines pis_ing_1
+	-- ON pis_ing_1.production_item_id = production_items.reference_number AND production_item_line_type = 'ingredient'
   
 -- menu as ing sub ing
 LEFT JOIN ingredients as sub_main_ingr_1
@@ -384,7 +386,7 @@ m_s_2 as (select
                                         ),
                                         bas_ing_2.bi_code,
                                         ims2.tasteless_code,
-                                        pis_ing_2.item_code,
+                                      --  pis_ing_2.item_code,
                                         ni2.nwi_code,
                                         im_as_ing_2.tasteless_menu_code
                                     )
@@ -403,7 +405,7 @@ m_s_2 as (select
                                         ),
                                         bas_ing_2.bi_code,
                                         ims2.tasteless_code,
-                                        pis_ing_2.item_code,
+                                      --  pis_ing_2.item_code,
                                         ni2.nwi_code,
                                         im_as_ing_2.tasteless_menu_code
                                     )
@@ -422,7 +424,7 @@ m_s_2 as (select
                                         ),
                                         bas_ing_2.bi_code,
                                         ims2.tasteless_code,
-                                        pis_ing_2.item_code,
+                                       -- pis_ing_2.item_code,
                                         ni2.nwi_code,
                                         im_as_ing_2.tasteless_menu_code
                                     )
@@ -441,7 +443,7 @@ m_s_2 as (select
                                         ),
                                         bas_ing_2.bi_code,
                                         ims2.tasteless_code,
-                                        pis_ing_2.item_code,
+                                     --   pis_ing_2.item_code,
                                         ni2.nwi_code,
                                         im_as_ing_2.tasteless_menu_code
                                     )
@@ -460,7 +462,7 @@ m_s_2 as (select
                                         ),
                                         bas_ing_2.bi_code,
                                         ims2.tasteless_code,
-                                        pis_ing_2.item_code,
+                                        -- pis_ing_2.item_code,
                                         ni2.nwi_code,
                                         im_as_ing_2.tasteless_menu_code
                                     )
@@ -479,7 +481,7 @@ m_s_2 as (select
         ),
         bas_ing_2.bi_code,
         ims2.tasteless_code,
-        pis_ing_2.item_code,
+      --  pis_ing_2.item_code,
         ni2.nwi_code 
     ) AS menu_item_ingredients_code_sub_2,
     
@@ -494,15 +496,15 @@ m_s_2 as (select
         ),
         bas_ing_2.ingredient_description,
         ims2.full_item_description,
-        pis_ing_2.description,
+       -- pis_ing_2.description,
         ni2.item_description 
     ) AS menu_item_ingredients_description_sub_2 
   
 from m_s_1  
   
 -- production items
-LEFT JOIN production_item_lines pis_ing_2
-	ON pis_ing_2.production_item_id = m_s_1.menu_item_ingredients_code_sub_1 AND m_s_1.sub_types_1 = 'PIMFS' AND pis_ing_2.production_item_line_type = 'ingredient'
+-- LEFT JOIN production_item_lines pis_ing_2
+	-- ON pis_ing_2.production_item_id = m_s_1.menu_item_ingredients_code_sub_1 AND m_s_1.sub_types_1 = 'PIMFS' AND pis_ing_2.production_item_line_type = 'ingredient'
   
 -- menu as ing sub ing
 
@@ -570,7 +572,7 @@ select
                                         ),
                                         bas_ing_3.bi_code,
                                         ims3.tasteless_code,
-                                        pis_ing_3.item_code,
+                                    --    pis_ing_3.item_code,
                                         ni3.nwi_code,
                                         im_as_ing_3.tasteless_menu_code
                                     )
@@ -589,7 +591,7 @@ select
                                         ),
                                         bas_ing_3.bi_code,
                                         ims3.tasteless_code,
-                                        pis_ing_3.item_code,
+                                       -- pis_ing_3.item_code,
                                         ni3.nwi_code,
                                         im_as_ing_3.tasteless_menu_code
                                     )
@@ -608,7 +610,7 @@ select
                                         ),
                                         bas_ing_3.bi_code,
                                         ims3.tasteless_code,
-                                        pis_ing_3.item_code,
+                                      --  pis_ing_3.item_code,
                                         ni3.nwi_code,
                                         im_as_ing_3.tasteless_menu_code
                                     )
@@ -627,7 +629,7 @@ select
                                         ),
                                         bas_ing_3.bi_code,
                                         ims3.tasteless_code,
-                                        pis_ing_3.item_code,
+                                    --    pis_ing_3.item_code,
                                         ni3.nwi_code,
                                         im_as_ing_3.tasteless_menu_code
                                     )
@@ -646,7 +648,7 @@ select
                                         ),
                                         bas_ing_3.bi_code,
                                         ims3.tasteless_code,
-                                        pis_ing_3.item_code,
+                                    --    pis_ing_3.item_code,
                                         ni3.nwi_code,
                                         im_as_ing_3.tasteless_menu_code
                                     )
@@ -665,7 +667,7 @@ select
         ),
         bas_ing_3.bi_code,
         ims3.tasteless_code,
-        pis_ing_3.item_code,
+      --  pis_ing_3.item_code,
         ni3.nwi_code 
     ) AS menu_item_ingredients_code_sub_3,
     
@@ -680,15 +682,15 @@ select
         ),
         bas_ing_3.ingredient_description,
         ims3.full_item_description,
-        pis_ing_3.description,
+       -- pis_ing_3.description,
         ni3.item_description 
     ) AS menu_item_ingredients_description_sub_3 
   
 from m_s_2
   
 -- production items
-LEFT JOIN production_item_lines pis_ing_3
-	ON pis_ing_3.production_item_id = m_s_2.menu_item_ingredients_code_sub_2 AND m_s_2.sub_types_2 = 'PIMFS' AND pis_ing_3.production_item_line_type = 'ingredient'
+-- LEFT JOIN production_item_lines pis_ing_3
+	-- ON pis_ing_3.production_item_id = m_s_2.menu_item_ingredients_code_sub_2 AND m_s_2.sub_types_2 = 'PIMFS' AND pis_ing_3.production_item_line_type = 'ingredient'
   
 -- menu as ing sub ing
 
