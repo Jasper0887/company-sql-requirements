@@ -167,7 +167,8 @@ CASE
                          ni_batch_1.nwi_code, 
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
-                ims1.tasteless_code, 
+                ims1.tasteless_code,
+                 pi1.reference_number,
                -- pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
@@ -184,7 +185,8 @@ CASE
                          ni_batch_1.nwi_code, 
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
-                ims1.tasteless_code, 
+                ims1.tasteless_code,
+                 pi1.reference_number,
               --  pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
@@ -201,7 +203,8 @@ CASE
                          ni_batch_1.nwi_code, 
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
-                ims1.tasteless_code, 
+                ims1.tasteless_code,
+                 pi1.reference_number,
                -- pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
@@ -218,7 +221,8 @@ CASE
                          ni_batch_1.nwi_code, 
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
-                ims1.tasteless_code, 
+                ims1.tasteless_code,
+                pi1.reference_number,
               --  pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
@@ -235,7 +239,8 @@ CASE
                          ni_batch_1.nwi_code, 
                          im_as_ing__batch_1.tasteless_menu_code), 
                 bas_ing_1.bi_code, 
-                ims1.tasteless_code, 
+                ims1.tasteless_code,
+                 pi1.reference_number,
               --  pis_ing_1.item_code, 
                 ni1.nwi_code, 
                 im_as_ing_1.tasteless_menu_code
@@ -277,7 +282,190 @@ COALESCE(
     pi1.full_item_description,
     ni1.item_description,
     im_as_ing_1.menu_item_description
-) AS menu_item_ingredients_description_sub_1
+) AS menu_item_ingredients_description_sub_1,
+
+COALESCE(
+	COALESCE(
+		sub_main_ing_batch_1.packaging_size,
+        bs1_header.quantity,
+        ims_batch_1.packaging_size,
+        pi_batch_1.packaging_size,
+        ni_batch_1.packaging_size
+    ),
+    bas_ing_1.quantity,
+    ims1.packaging_size,
+    -- pis_ing_1item_code,
+    pi1.packaging_size,
+    ni1.packaging_size,
+    sub_main_ingr_1.packaging_size,
+    CASE
+        WHEN
+    COALESCE(
+        COALESCE(
+            im_as_ing__batch_1.menu_item_description,
+            bs1_header.ingredient_description,
+            ims_batch_1.full_item_description,
+            pi_batch_1.full_item_description,
+            ni_batch_1.item_description,
+            im_as_ing__batch_1.menu_item_description
+        ), -- batch
+        bas_ing_1.ingredient_description,
+        ims1.full_item_description,
+        -- pis_ing_1item_code,
+        pi1.full_item_description,
+        ni1.item_description,
+        im_as_ing_1.menu_item_description
+    )   is not null
+        THEN 1
+    END
+) AS sub_packaging_size_1,
+
+
+ROUND(
+    (
+       COALESCE(sub_main_ingr_1.prep_qty,
+                bs1.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_1.yield,
+                bs1.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+) AS sub_ingredient_qty_1,
+
+coalesce(pack_sub_1.packaging_description ,uom_sub_1.`uom_description`) as sub_uom_1,
+
+
+round( ROUND(
+    (
+       COALESCE(sub_main_ingr_1.prep_qty,
+                bs1.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_1.yield,
+                bs1.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+)   /   COALESCE(
+            COALESCE(
+                sub_main_ing_batch_1.packaging_size,
+                bs1_header.quantity,
+                ims_batch_1.packaging_size,
+                pi_batch_1.packaging_size,
+                ni_batch_1.packaging_size
+            ),
+            bas_ing_1.quantity,
+            ims1.packaging_size,
+            -- pis_ing_1item_code,
+            pi1.packaging_size,
+            ni1.packaging_size,
+            sub_main_ingr_1.packaging_size,
+            CASE
+                WHEN
+            COALESCE(
+                COALESCE(
+                    im_as_ing__batch_1.menu_item_description,
+                    bs1_header.ingredient_description,
+                    ims_batch_1.full_item_description,
+                    pi_batch_1.full_item_description,
+                    ni_batch_1.item_description,
+                    im_as_ing__batch_1.menu_item_description
+                ), -- batch
+                bas_ing_1.ingredient_description,
+                ims1.full_item_description,
+                -- pis_ing_1item_code,
+                pi1.full_item_description,
+                ni1.item_description,
+                im_as_ing_1.menu_item_description
+            )   is not null
+                THEN 1
+            END
+), 4) as sku_converted_sub_1,
+
+
+COALESCE(
+            COALESCE(
+                im_as_ing_1.ingredient_total_cost,
+                bs1_header.ttp,
+                ims_batch_1.landed_cost,
+                pi_batch_1.landed_cost,
+                ni_batch_1.ttp
+            ),
+            bas_ing_1.ttp,
+            ims1.landed_cost,
+            -- pis_ing_1item_code,
+            pi1.landed_cost,
+            ni1.ttp,
+            im_as_ing_1.ingredient_total_cost
+ ) as landed_cost_sub_1,
+
+
+
+round( ROUND(
+    (
+       COALESCE(sub_main_ingr_1.prep_qty,
+                bs1.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_1.yield,
+                bs1.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+)   /   COALESCE(
+            COALESCE(
+                sub_main_ing_batch_1.packaging_size,
+                bs1_header.quantity,
+                ims_batch_1.packaging_size,
+                pi_batch_1.packaging_size,
+                ni_batch_1.packaging_size
+            ),
+            bas_ing_1.quantity,
+            ims1.packaging_size,
+            -- pis_ing_1item_code,
+            pi1.packaging_size,
+            ni1.packaging_size,
+            sub_main_ingr_1.packaging_size,
+            CASE
+                WHEN
+            COALESCE(
+                COALESCE(
+                    im_as_ing__batch_1.menu_item_description,
+                    bs1_header.ingredient_description,
+                    ims_batch_1.full_item_description,
+                    pi_batch_1.full_item_description,
+                    ni_batch_1.item_description,
+                    im_as_ing__batch_1.menu_item_description
+                ), -- batch
+                bas_ing_1.ingredient_description,
+                ims1.full_item_description,
+                -- pis_ing_1item_code,
+                pi1.full_item_description,
+                ni1.item_description,
+                im_as_ing_1.menu_item_description
+            )   is not null
+                THEN 1
+            END
+), 4) * COALESCE(
+            COALESCE(
+                im_as_ing_1.ingredient_total_cost,
+                bs1_header.ttp,
+                ims_batch_1.landed_cost,
+                pi_batch_1.landed_cost,
+                ni_batch_1.ttp
+            ),
+            bas_ing_1.ttp,
+            ims1.landed_cost,
+            -- pis_ing_1item_code,
+            pi1.landed_cost,
+            ni1.ttp,
+            im_as_ing_1.ingredient_total_cost
+ ) as sub_unit_ost_1
 
 FROM full_menu_with_ingredients menu_book
  
@@ -365,7 +553,45 @@ LEFT JOIN production_items as pi_batch_1
   
 LEFT JOIN new_ingredients as ni_batch_1
 	ON ni_batch_1.id = bs1.new_ingredients_id
-  
+
+LEFT JOIN uoms as uom_sub_1 ON
+            uom_sub_1.id =     COALESCE(
+                            COALESCE(
+                                im_as_ing__batch_1.uoms_id,
+                                bs1_header.uoms_id,
+                                ims_batch_1.uoms_id,
+                                pi_batch_1.uoms_id,
+                                ni_batch_1.uoms_id,
+                                im_as_ing__batch_1.uoms_id
+                            ), -- batch
+                            bas_ing_1.uoms_id,
+                            ims1.uoms_id,
+                            -- pis_ing_1item_code,
+                            pi1.uoms_id,
+                            ni1.uoms_id,
+                            im_as_ing_1.uoms_id
+                        )
+
+
+LEFT JOIN packagings as pack_sub_1 ON
+            pack_sub_1.id =   COALESCE(
+                            COALESCE(
+                                im_as_ing__batch_1.uoms_id,
+                                bs1_header.uoms_id,
+                                ims_batch_1.packagings_id,
+                                pi_batch_1.packagings_id,
+                                ni_batch_1.uoms_id,
+                                im_as_ing__batch_1.uoms_id
+                            ), -- batch
+                            bas_ing_1.uoms_id,
+                            ims1.packagings_id,
+                            -- pis_ing_1item_code,
+                            pi1.packagings_id,
+                            ni1.uoms_id,
+                            im_as_ing_1.uoms_id
+                        )
+
+
 where menu_book.status is not null),
 
 m_s_2 as (select   
@@ -498,7 +724,190 @@ m_s_2 as (select
         ims2.full_item_description,
        -- pis_ing_2.description,
         ni2.item_description 
-    ) AS menu_item_ingredients_description_sub_2 
+    ) AS menu_item_ingredients_description_sub_2,
+
+    COALESCE(
+	COALESCE(
+		sub_main_ing_batch_2.packaging_size,
+        bs2_header.quantity,
+        ims_batch_2.packaging_size,
+        pi_batch_2.packaging_size,
+        ni_batch_2.packaging_size
+    ),
+    bas_ing_2.quantity,
+    ims2.packaging_size,
+    -- pis_ing_2item_code,
+    pi2.packaging_size,
+    ni2.packaging_size,
+    sub_main_ingr_2.packaging_size,
+    CASE
+        WHEN
+    COALESCE(
+        COALESCE(
+            im_as_ing__batch_2.menu_item_description,
+            bs2_header.ingredient_description,
+            ims_batch_2.full_item_description,
+            pi_batch_2.full_item_description,
+            ni_batch_2.item_description,
+            im_as_ing__batch_2.menu_item_description
+        ), -- batch
+        bas_ing_2.ingredient_description,
+        ims2.full_item_description,
+        -- pis_ing_2item_code,
+        pi2.full_item_description,
+        ni2.item_description,
+        im_as_ing_2.menu_item_description
+    )   is not null
+        THEN 1
+    END
+) AS sub_packaging_size_2,
+
+
+ROUND(
+    (
+       COALESCE(sub_main_ingr_2.prep_qty,
+                bs2.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_2.yield,
+                bs2.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+) AS sub_ingredient_qty_2,
+
+coalesce(pack_sub_2.packaging_description ,uom_sub_2.`uom_description`) as sub_uom_2,
+
+
+round( ROUND(
+    (
+       COALESCE(sub_main_ingr_2.prep_qty,
+                bs2.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_2.yield,
+                bs2.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+)   /   COALESCE(
+            COALESCE(
+                sub_main_ing_batch_2.packaging_size,
+                bs2_header.quantity,
+                ims_batch_2.packaging_size,
+                pi_batch_2.packaging_size,
+                ni_batch_2.packaging_size
+            ),
+            bas_ing_2.quantity,
+            ims2.packaging_size,
+            -- pis_ing_2item_code,
+            pi2.packaging_size,
+            ni2.packaging_size,
+            sub_main_ingr_2.packaging_size,
+            CASE
+                WHEN
+            COALESCE(
+                COALESCE(
+                    im_as_ing__batch_2.menu_item_description,
+                    bs2_header.ingredient_description,
+                    ims_batch_2.full_item_description,
+                    pi_batch_2.full_item_description,
+                    ni_batch_2.item_description,
+                    im_as_ing__batch_2.menu_item_description
+                ), -- batch
+                bas_ing_2.ingredient_description,
+                ims2.full_item_description,
+                -- pis_ing_2item_code,
+                pi2.full_item_description,
+                ni2.item_description,
+                im_as_ing_2.menu_item_description
+            )   is not null
+                THEN 1
+            END
+), 4) as sku_converted_sub_2,
+
+
+COALESCE(
+            COALESCE(
+                im_as_ing_2.ingredient_total_cost,
+                bs2_header.ttp,
+                ims_batch_2.landed_cost,
+                pi_batch_2.landed_cost,
+                ni_batch_2.ttp
+            ),
+            bas_ing_2.ttp,
+            ims2.landed_cost,
+            -- pis_ing_2item_code,
+            pi2.landed_cost,
+            ni2.ttp,
+            im_as_ing_2.ingredient_total_cost
+ ) as landed_cost_sub_2,
+
+
+
+round( ROUND(
+    (
+       COALESCE(sub_main_ingr_2.prep_qty,
+                bs2.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_2.yield,
+                bs2.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+)   /   COALESCE(
+            COALESCE(
+                sub_main_ing_batch_2.packaging_size,
+                bs2_header.quantity,
+                ims_batch_2.packaging_size,
+                pi_batch_2.packaging_size,
+                ni_batch_2.packaging_size
+            ),
+            bas_ing_2.quantity,
+            ims2.packaging_size,
+            -- pis_ing_2item_code,
+            pi2.packaging_size,
+            ni2.packaging_size,
+            sub_main_ingr_2.packaging_size,
+            CASE
+                WHEN
+            COALESCE(
+                COALESCE(
+                    im_as_ing__batch_2.menu_item_description,
+                    bs2_header.ingredient_description,
+                    ims_batch_2.full_item_description,
+                    pi_batch_2.full_item_description,
+                    ni_batch_2.item_description,
+                    im_as_ing__batch_2.menu_item_description
+                ), -- batch
+                bas_ing_2.ingredient_description,
+                ims2.full_item_description,
+                -- pis_ing_2item_code,
+                pi2.full_item_description,
+                ni2.item_description,
+                im_as_ing_2.menu_item_description
+            )   is not null
+                THEN 1
+            END
+), 4) * COALESCE(
+            COALESCE(
+                im_as_ing_2.ingredient_total_cost,
+                bs2_header.ttp,
+                ims_batch_2.landed_cost,
+                pi_batch_2.landed_cost,
+                ni_batch_2.ttp
+            ),
+            bas_ing_2.ttp,
+            ims2.landed_cost,
+            -- pis_ing_2item_code,
+            pi2.landed_cost,
+            ni2.ttp,
+            im_as_ing_2.ingredient_total_cost
+ ) as sub_unit_ost_2
   
 from m_s_1  
   
@@ -552,7 +961,48 @@ LEFT JOIN production_items as pi_batch_2
 	ON pi_batch_2.id = bs2.production_items_id
   
 LEFT JOIN new_ingredients as ni_batch_2
-	ON ni_batch_2.id = bs2.new_ingredients_id)
+	ON ni_batch_2.id = bs2.new_ingredients_id
+
+LEFT JOIN uoms as uom_sub_2 ON
+            uom_sub_2.id =     COALESCE(
+                            COALESCE(
+                                im_as_ing__batch_2.uoms_id,
+                                bs2_header.uoms_id,
+                                ims_batch_2.uoms_id,
+                                pi_batch_2.uoms_id,
+                                ni_batch_2.uoms_id,
+                                im_as_ing__batch_2.uoms_id
+                            ), -- batch
+                            bas_ing_2.uoms_id,
+                            ims2.uoms_id,
+                            -- pis_ing_2item_code,
+                            pi2.uoms_id,
+                            ni2.uoms_id,
+                            im_as_ing_2.uoms_id
+                        )
+
+
+LEFT JOIN packagings as pack_sub_2 ON
+            pack_sub_2.id =   COALESCE(
+                            COALESCE(
+                                im_as_ing__batch_2.uoms_id,
+                                bs2_header.uoms_id,
+                                ims_batch_2.packagings_id,
+                                pi_batch_2.packagings_id,
+                                ni_batch_2.uoms_id,
+                                im_as_ing__batch_2.uoms_id
+                            ), -- batch
+                            bas_ing_2.uoms_id,
+                            ims2.packagings_id,
+                            -- pis_ing_2item_code,
+                            pi2.packagings_id,
+                            ni2.uoms_id,
+                            im_as_ing_2.uoms_id
+                        )
+
+
+
+)
 
 select   
     m_s_2.*, 
@@ -655,7 +1105,7 @@ select
         ) THEN 'MMFF'
         ELSE 'UNKNOWN'
     END AS sub_types_3,
-    
+
     COALESCE(
     	COALESCE(
     		im_as_ing__batch_3.tasteless_menu_code,
@@ -684,7 +1134,190 @@ select
         ims3.full_item_description,
        -- pis_ing_3.description,
         ni3.item_description 
-    ) AS menu_item_ingredients_description_sub_3 
+    ) AS menu_item_ingredients_description_sub_3,
+
+    COALESCE(
+	COALESCE(
+		sub_main_ing_batch_3.packaging_size,
+        bs3_header.quantity,
+        ims_batch_3.packaging_size,
+        pi_batch_3.packaging_size,
+        ni_batch_3.packaging_size
+    ),
+    bas_ing_3.quantity,
+    ims3.packaging_size,
+    -- pis_ing_3item_code,
+    pi3.packaging_size,
+    ni3.packaging_size,
+    sub_main_ingr_3.packaging_size,
+    CASE
+        WHEN
+    COALESCE(
+        COALESCE(
+            im_as_ing__batch_3.menu_item_description,
+            bs3_header.ingredient_description,
+            ims_batch_3.full_item_description,
+            pi_batch_3.full_item_description,
+            ni_batch_3.item_description,
+            im_as_ing__batch_3.menu_item_description
+        ), -- batch
+        bas_ing_3.ingredient_description,
+        ims3.full_item_description,
+        -- pis_ing_3item_code,
+        pi3.full_item_description,
+        ni3.item_description,
+        im_as_ing_3.menu_item_description
+    )   is not null
+        THEN 3
+    END
+) AS sub_packaging_size_3,
+
+
+ROUND(
+    (
+       COALESCE(sub_main_ingr_3.prep_qty,
+                bs3.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_3.yield,
+                bs3.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+) AS sub_ingredient_qty_3,
+
+coalesce(pack_sub_3.packaging_description ,uom_sub_3.`uom_description`) as sub_uom_3,
+
+
+round( ROUND(
+    (
+       COALESCE(sub_main_ingr_3.prep_qty,
+                bs3.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_3.yield,
+                bs3.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+)   /   COALESCE(
+            COALESCE(
+                sub_main_ing_batch_3.packaging_size,
+                bs3_header.quantity,
+                ims_batch_3.packaging_size,
+                pi_batch_3.packaging_size,
+                ni_batch_3.packaging_size
+            ),
+            bas_ing_3.quantity,
+            ims3.packaging_size,
+            -- pis_ing_3item_code,
+            pi3.packaging_size,
+            ni3.packaging_size,
+            sub_main_ingr_3.packaging_size,
+            CASE
+                WHEN
+            COALESCE(
+                COALESCE(
+                    im_as_ing__batch_3.menu_item_description,
+                    bs3_header.ingredient_description,
+                    ims_batch_3.full_item_description,
+                    pi_batch_3.full_item_description,
+                    ni_batch_3.item_description,
+                    im_as_ing__batch_3.menu_item_description
+                ), -- batch
+                bas_ing_3.ingredient_description,
+                ims3.full_item_description,
+                -- pis_ing_3item_code,
+                pi3.full_item_description,
+                ni3.item_description,
+                im_as_ing_3.menu_item_description
+            )   is not null
+                THEN 3
+            END
+), 4) as sku_converted_sub_3,
+
+
+COALESCE(
+            COALESCE(
+                im_as_ing_3.ingredient_total_cost,
+                bs3_header.ttp,
+                ims_batch_3.landed_cost,
+                pi_batch_3.landed_cost,
+                ni_batch_3.ttp
+            ),
+            bas_ing_3.ttp,
+            ims3.landed_cost,
+            -- pis_ing_3item_code,
+            pi3.landed_cost,
+            ni3.ttp,
+            im_as_ing_3.ingredient_total_cost
+ ) as landed_cost_sub_3,
+
+
+
+round( ROUND(
+    (
+       COALESCE(sub_main_ingr_3.prep_qty,
+                bs3.prep_qty) / ROUND(
+            (
+                COALESCE(sub_main_ingr_3.yield,
+                bs3.yield)  / 100
+            ),
+            4
+        )
+    ),
+    4
+)   /   COALESCE(
+            COALESCE(
+                sub_main_ing_batch_3.packaging_size,
+                bs3_header.quantity,
+                ims_batch_3.packaging_size,
+                pi_batch_3.packaging_size,
+                ni_batch_3.packaging_size
+            ),
+            bas_ing_3.quantity,
+            ims3.packaging_size,
+            -- pis_ing_3item_code,
+            pi3.packaging_size,
+            ni3.packaging_size,
+            sub_main_ingr_3.packaging_size,
+            CASE
+                WHEN
+            COALESCE(
+                COALESCE(
+                    im_as_ing__batch_3.menu_item_description,
+                    bs3_header.ingredient_description,
+                    ims_batch_3.full_item_description,
+                    pi_batch_3.full_item_description,
+                    ni_batch_3.item_description,
+                    im_as_ing__batch_3.menu_item_description
+                ), -- batch
+                bas_ing_3.ingredient_description,
+                ims3.full_item_description,
+                -- pis_ing_3item_code,
+                pi3.full_item_description,
+                ni3.item_description,
+                im_as_ing_3.menu_item_description
+            )   is not null
+                THEN 3
+            END
+), 4) * COALESCE(
+            COALESCE(
+                im_as_ing_3.ingredient_total_cost,
+                bs3_header.ttp,
+                ims_batch_3.landed_cost,
+                pi_batch_3.landed_cost,
+                ni_batch_3.ttp
+            ),
+            bas_ing_3.ttp,
+            ims3.landed_cost,
+            -- pis_ing_3item_code,
+            pi3.landed_cost,
+            ni3.ttp,
+            im_as_ing_3.ingredient_total_cost
+ ) as sub_unit_ost_3
   
 from m_s_2
   
@@ -739,7 +1372,44 @@ LEFT JOIN production_items as pi_batch_3
   
 LEFT JOIN new_ingredients as ni_batch_3
 	ON ni_batch_3.id = bs3.new_ingredients_id
-  
+
+LEFT JOIN uoms as uom_sub_3 ON
+            uom_sub_3.id =     COALESCE(
+                            COALESCE(
+                                im_as_ing__batch_3.uoms_id,
+                                bs3_header.uoms_id,
+                                ims_batch_3.uoms_id,
+                                pi_batch_3.uoms_id,
+                                ni_batch_3.uoms_id,
+                                im_as_ing__batch_3.uoms_id
+                            ), -- batch
+                            bas_ing_3.uoms_id,
+                            ims3.uoms_id,
+                            -- pis_ing_3item_code,
+                            pi3.uoms_id,
+                            ni3.uoms_id,
+                            im_as_ing_3.uoms_id
+                        )
+
+
+LEFT JOIN packagings as pack_sub_3 ON
+            pack_sub_3.id =   COALESCE(
+                            COALESCE(
+                                im_as_ing__batch_3.uoms_id,
+                                bs3_header.uoms_id,
+                                ims_batch_3.packagings_id,
+                                pi_batch_3.packagings_id,
+                                ni_batch_3.uoms_id,
+                                im_as_ing__batch_3.uoms_id
+                            ), -- batch
+                            bas_ing_3.uoms_id,
+                            ims3.packagings_id,
+                            -- pis_ing_3item_code,
+                            pi3.packagings_id,
+                            ni3.uoms_id,
+                            im_as_ing_3.uoms_id
+                        )
+
 where m_s_2.menu_code = '6006056'
 
 -- make a void for menu_as_ing trat as menu header 7000000389
