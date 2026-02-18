@@ -1543,7 +1543,7 @@ m_s_3 as (select m_s_2.*,
                     WHEN bs3_line.ingredient_description IS NOT NULL
                          AND bs3_header.ttp IS NOT NULL
                          AND bs3_header.ttp > 1
-                    THEN 12
+                    THEN bs3_header.ttp
 
                     WHEN ims_batch_3.full_item_description IS NOT NULL
                          AND ims_batch_3.landed_cost IS NOT NULL
