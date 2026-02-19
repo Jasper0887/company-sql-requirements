@@ -63,7 +63,8 @@ WITH ingredients AS (
 							4
 						) AS ingredient_qty,
 
-						COALESCE(packagings.packaging_description, uoms.uom_description) AS uom_description,
+                        uoms.uom_description AS uom_small_unit,
+                        COALESCE(packagings.packaging_description, uoms.uom_description) AS uom_large_unit,
 
 						CASE
 							WHEN item_masters.landed_cost IS NOT NULL THEN item_masters.landed_cost
@@ -185,7 +186,8 @@ WITH ingredients AS (
 							4
 						) AS sub_ingredient_qty_1,
 
-						COALESCE(pack_sub_1.packaging_description, uom_sub_1.uom_description) AS sub_uom_1,
+					    uom_sub_1.uom_description AS uom_small_unit_sub_1,
+						COALESCE(pack_sub_1.packaging_description, uom_sub_1.uom_description) AS uom_large_unit_sub_1,
 
 						CASE
 							WHEN im_as_ing__batch_1.menu_item_description IS NOT NULL
@@ -254,22 +256,23 @@ WITH ingredients AS (
 						ON menu_as_ing.id = sub_main_ingr_1.menu_items_id
 
 					LEFT JOIN uoms
-						ON uoms.id = COALESCE(
+						ON uoms.id =  COALESCE(
 							item_masters.uoms_id,
 							batching_ingredients.uoms_id,
-							sub_main_ingr_1.uom_id,
+							menu_as_ing.uoms_id,
 							production_items.uoms_id,
 							new_ingredients.uoms_id
 						)
 
+
+
 					LEFT JOIN packagings
 						ON packagings.id = COALESCE(
 							item_masters.packagings_id,
-							batching_ingredients.uoms_id,
-							sub_main_ingr_1.uom_id,
-							production_items.packagings_id,
-							new_ingredients.uoms_id
+							production_items.packagings_id
 						)
+
+					-- ingredients section
 
 					LEFT JOIN menu_items AS im_as_ing_1
 						ON im_as_ing_1.id = sub_main_ingr_1.menu_as_ingredient_id
@@ -299,12 +302,14 @@ WITH ingredients AS (
 
 					LEFT JOIN uoms AS uom_sub_1
 						ON uom_sub_1.id = COALESCE(
+                            -- batch sub
 							im_as_ing__batch_1.uoms_id,
 							bs1_header.uoms_id,
 							ims_batch_1.uoms_id,
 							pi_batch_1.uoms_id,
 							ni_batch_1.uoms_id,
 							bas_ing_1.uoms_id,
+                            -- menu list sub
 							ims1.uoms_id,
 							pi1.uoms_id,
 							ni1.uoms_id,
@@ -313,16 +318,10 @@ WITH ingredients AS (
 
 					LEFT JOIN packagings AS pack_sub_1
 						ON pack_sub_1.id = COALESCE(
-							im_as_ing__batch_1.uoms_id,
-							bs1_header.uoms_id,
 							ims_batch_1.packagings_id,
 							pi_batch_1.packagings_id,
-							ni_batch_1.uoms_id,
-							bas_ing_1.uoms_id,
 							ims1.packagings_id,
-							pi1.packagings_id,
-							ni1.uoms_id,
-							im_as_ing_1.uoms_id
+							pi1.packagings_id
 						)
 
 					WHERE menu_book.status IS NOT NULL
@@ -338,18 +337,20 @@ WITH ingredients AS (
                         b.menu_item_ingredients_description,
                         b.packaging_size,
                         b.ingredient_qty,
-                        b.uom_description,
-                        b.landed_cost,
+                        b.uom_small_unit,
 						ROUND((b.ingredient_qty / b.packaging_size), 4) AS sku_converted,
+						b.uom_large_unit,
+                        b.landed_cost,
 						ROUND(ROUND((b.ingredient_qty / b.packaging_size), 4) * b.landed_cost, 4) AS cost,
                         b.sub_types_1,
                         b.menu_item_ingredients_code_sub_1,
                         b.menu_item_ingredients_description_sub_1,
                         b.sub_packaging_size_1,
                         b.sub_ingredient_qty_1,
-                        b.sub_uom_1,
+                        b.uom_small_unit_sub_1,
+                        ROUND((b.sub_ingredient_qty_1 / b.sub_packaging_size_1), 4) AS sku_converted_sub_1,
+                        b.uom_large_unit_sub_1,
                         b.landed_cost_sub_1,
-						ROUND((b.sub_ingredient_qty_1 / b.sub_packaging_size_1), 4) AS sku_converted_sub_1,
 						ROUND(ROUND((b.sub_ingredient_qty_1 / b.sub_packaging_size_1), 4) * b.landed_cost_sub_1, 4) AS sub_unit_ost_1
 					FROM m_s_1_base b
 				)
